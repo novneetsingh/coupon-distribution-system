@@ -17,9 +17,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Trust first proxy for secure cookies
+app.set("trust proxy", 1);
+
 app.use(express.json()); // Parse JSON requests
 app.use(cookieParser()); // Parse cookies
-app.set("trust proxy", true); // Enable proxy to get client IP address
 
 require("./config/database").dbconnect(); // Connect to database
 

@@ -135,7 +135,12 @@ exports.claimCoupon = async (req, res) => {
     await ClaimedIP.create({ ip: clientIP });
 
     // Set a cookie to prevent the same browser from claiming again immediately
-    res.cookie("couponClaimed", true, { maxAge: 3600000 }); // 1 hour
+    res.cookie("couponClaimed", true, {
+      maxAge: 3600000, // 1 hour
+      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+      secure: process.env.NODE_ENV === "production", // Only send the cookie over HTTPS in production
+      sameSite: "strict", // Prevent the cookie from being sent along with requests to other sites
+    });
 
     res
       .status(200)
