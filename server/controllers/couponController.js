@@ -87,11 +87,17 @@ exports.getDashboardStats = async (req, res) => {
 // Claim a coupon with abuse prevention and round-robin distribution
 exports.claimCoupon = async (req, res) => {
   try {
-    // Get client's IP address: Prefer x-forwarded-for for proxies, fallback to socket remoteAddress
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    // Get client's IP address from x-forwarded-for header
+    // Extract only the first IP which is the original client IP
+    let clientIP = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+    // If x-forwarded-for contains multiple IPs (comma separated), take only the first one
+    if (clientIP?.includes(",")) {
+      clientIP = clientIP.split(",")[0].trim();
+    }
 
     // Check if the user's IP has already claimed a coupon
-    const claimedIP = await ClaimedIP.findOne({ ip });
+    const claimedIP = await ClaimedIP.findOne({ ip: clientIP });
     if (claimedIP) {
       // Calculate time remaining
       const currentTime = new Date();
@@ -126,7 +132,7 @@ exports.claimCoupon = async (req, res) => {
     }
 
     // Save the IP in the database with a 1-hour expiry
-    await ClaimedIP.create({ ip });
+    await ClaimedIP.create({ ip: clientIP });
 
     // Set a cookie to prevent the same browser from claiming again immediately
     res.cookie("couponClaimed", true, { maxAge: 3600000 }); // 1 hour
