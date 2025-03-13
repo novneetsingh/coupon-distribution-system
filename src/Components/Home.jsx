@@ -18,10 +18,7 @@ const Home = () => {
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/coupon/claim`,
-        {},
-        {
-          withCredentials: true,
-        }
+        {}
       );
 
       const data = response.data;

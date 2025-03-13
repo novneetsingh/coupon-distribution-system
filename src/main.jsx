@@ -3,6 +3,10 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import axios from "axios";
+
+// Configure axios to always include credentials with all requests
+axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

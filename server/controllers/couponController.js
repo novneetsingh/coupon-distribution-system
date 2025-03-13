@@ -137,9 +137,10 @@ exports.claimCoupon = async (req, res) => {
     // Set a cookie to prevent the same browser from claiming again immediately
     res.cookie("couponClaimed", true, {
       maxAge: 3600000, // 1 hour
-      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-      secure: process.env.NODE_ENV === "production", // Only send the cookie over HTTPS in production
-      sameSite: "strict", // Prevent the cookie from being sent along with requests to other sites
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Use 'none' for cross-origin in production
+      path: "/", // Make available on all paths
     });
 
     res
